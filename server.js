@@ -6,9 +6,7 @@ app.use(express.json())
 
 const users = [{ name: 'Name'}]
 
-app.get('/users', (req, res) => {
-    res.json(users)
-})
+app.get('/users', (req, res) => {res.json(users)})
 
 app.post('/users', async(req, res) => {
     try {
@@ -25,19 +23,25 @@ app.post('/users', async(req, res) => {
 })
 
 app.post('/users/login', async (req, res) => {
-    const user = users.find(user => user.name = req.body.name)
-    if (user == null) {
-        return res.status(400).send('not registered')
+    // "==" for comparison, and "=" for assignment
+    const user = users.find ((user) => user.name == req.body.name)
+
+    // checks if there is not user / user == undefined or user == null
+
+    if (!user || user == null || user == undefined) {
+        return res.status(400).send("not registered")
     }
-     try {
-        if(await bcrypt.compare(req.body.passwword, user.password)) {
-            res.send('Success')
-        } else {
-            res.send('Not successful')
-    } 
-    }catch { 
-        res.status(500).send()
-        }
+
+    // checks password accuracy
+    const isPassword = await bcrypt.compare(req.body.password, user.password)
+
+    if (isPassword) {
+        res.send("Successfully logged-in!")
+    } else {
+        res.send("Unsuccessful entry")
+        
+    }
+
 })
 
 app.listen(3000)
